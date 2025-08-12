@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: microservice-notification-producer
+          uri: lb://microservice-notification-producer
+          predicates:
+            - Path=/producer/**
+          filters:
+            - RewritePath=/producer/(?<segment>.*), /${segment}
+
+        - id: microservice-notification-dispatcher
+          uri: lb://microservice-notification-dispatcher
+          predicates:
+            - Path=/dispatcher/**
+          filters:
+            - RewritePath=/dispatcher/(?<segment>.*), /${segment}

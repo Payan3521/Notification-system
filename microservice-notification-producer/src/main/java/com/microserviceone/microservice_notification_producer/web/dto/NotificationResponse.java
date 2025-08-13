@@ -1,5 +1,5 @@
 package com.microserviceone.microservice_notification_producer.web.dto;
 
-public class e {
+public class NotificationResponse {
     
 }

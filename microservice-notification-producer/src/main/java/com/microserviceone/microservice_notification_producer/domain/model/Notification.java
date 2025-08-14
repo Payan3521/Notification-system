@@ -10,12 +10,12 @@ public class Notification {
     private String body;
     private String channel;
     private LocalDateTime createdAt;
-    private String status;
+    private Status status;
     private LocalDateTime sentTime;
     private int retryCount;
 
 
-    public Notification(String id, String info, String subject, String body, String channel, LocalDateTime createdAt, String status, LocalDateTime sentTime, int retryCount) {
+    public Notification(String id, String info, String subject, String body, String channel, LocalDateTime createdAt, Status status, LocalDateTime sentTime, int retryCount) {
         this.id = id;
         this.info = info;
         this.subject = subject;
@@ -80,11 +80,11 @@ public class Notification {
         this.createdAt = createdAt;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return this.status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -104,4 +104,9 @@ public class Notification {
         this.retryCount = retryCount;
     }
     
+    public enum Status{
+        PENDING,
+        SENT,
+        FAILED
+    }
 }

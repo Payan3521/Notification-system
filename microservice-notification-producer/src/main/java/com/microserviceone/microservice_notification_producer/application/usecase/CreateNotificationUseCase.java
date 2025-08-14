@@ -5,9 +5,15 @@ import org.springframework.stereotype.Service;
 import com.microserviceone.microservice_notification_producer.domain.model.Notification;
 import com.microserviceone.microservice_notification_producer.domain.model.Notification.Channel;
 import com.microserviceone.microservice_notification_producer.domain.port.in.ICreateNotification;
+import com.microserviceone.microservice_notification_producer.domain.port.out.INotificationPublisherSNS;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor
 public class CreateNotificationUseCase implements ICreateNotification{
+
+    private final INotificationPublisherSNS notificationPublisherSNS;
 
     @Override
     public Notification createNotification(Notification notification) {
@@ -29,7 +35,7 @@ public class CreateNotificationUseCase implements ICreateNotification{
         }
     }
 
-    private void createEvent(Notification notification){
-        //Crear metodo de evento
+    private Mono<Notification> createEvent(Notification notification){
+        return notificationPublisherSNS.publishNotification(notification);
     }
 }

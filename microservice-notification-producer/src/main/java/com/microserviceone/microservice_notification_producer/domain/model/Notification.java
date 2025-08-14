@@ -8,14 +8,14 @@ public class Notification {
     private String info;
     private String subject;
     private String body;
-    private String channel;
+    private Channel channel;
     private LocalDateTime createdAt;
     private Status status;
     private LocalDateTime sentTime;
     private int retryCount;
 
 
-    public Notification(String id, String info, String subject, String body, String channel, LocalDateTime createdAt, Status status, LocalDateTime sentTime, int retryCount) {
+    public Notification(String id, String info, String subject, String body, Channel channel, LocalDateTime createdAt, Status status, LocalDateTime sentTime, int retryCount) {
         this.id = id;
         this.info = info;
         this.subject = subject;
@@ -64,11 +64,11 @@ public class Notification {
         this.body = body;
     }
 
-    public String getChannel() {
+    public Channel getChannel() {
         return this.channel;
     }
 
-    public void setChannel(String channel) {
+    public void setChannel(Channel channel) {
         this.channel = channel;
     }
 
@@ -108,5 +108,11 @@ public class Notification {
         PENDING,
         SENT,
         FAILED
+    }
+
+    public enum Channel {
+        SMS,
+        MAIL,
+        UNKNOWN
     }
 }

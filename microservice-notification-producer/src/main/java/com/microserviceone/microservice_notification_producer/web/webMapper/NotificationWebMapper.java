@@ -2,14 +2,11 @@ package com.microserviceone.microservice_notification_producer.web.webMapper;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
 import org.springframework.stereotype.Component;
-
 import com.microserviceone.microservice_notification_producer.domain.model.Notification;
 import com.microserviceone.microservice_notification_producer.domain.model.Notification.Status;
 import com.microserviceone.microservice_notification_producer.web.dto.NotificationRequest;
 import com.microserviceone.microservice_notification_producer.web.dto.NotificationResponse;
-
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -39,7 +36,7 @@ public class NotificationWebMapper {
             .info(notification.getInfo())
             .subject(notification.getSubject())
             .body(notification.getBody())
-            .channel(notification.getChannel())
+            .channel(notification.getChannel().name())
             .createdAt(notification.getCreatedAt())
             .status(notification.getStatus().name())
             .sentTime(notification.getSentTime())

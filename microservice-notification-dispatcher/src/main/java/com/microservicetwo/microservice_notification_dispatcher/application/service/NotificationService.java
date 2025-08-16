@@ -13,8 +13,7 @@ public class NotificationService implements IGetNotificationById{
     @Override
     public Optional<Notification> getByIdNotification(String id) {
         
-        Optional<Notification> notification = getNotificationById.getByIdNotification(id);
+        return getNotificationById.getByIdNotification(id);
 
-        return notification;
     }
 }

@@ -4,11 +4,8 @@ import com.microservicetwo.microservice_notification_dispatcher.domain.exception
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.Notification;
 import com.microservicetwo.microservice_notification_dispatcher.domain.port.in.IGetNotificationById;
 import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.IAdapterNotification;
-
 import lombok.RequiredArgsConstructor;
-
 import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,8 +20,7 @@ public class GetNotificationByIdUseCase implements IGetNotificationById {
 
         if (notification.isPresent()) {
             return Optional.of(notification.get());   
-        }
-        else{
+        }else{
             throw new NotificationNotFoundException(id);
         }
 

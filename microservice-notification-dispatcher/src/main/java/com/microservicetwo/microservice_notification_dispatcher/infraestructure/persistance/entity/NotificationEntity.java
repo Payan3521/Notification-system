@@ -3,10 +3,12 @@ package com.microservicetwo.microservice_notification_dispatcher.infraestructure
 import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Data;
 
 @Entity
+@Table(name = "notifications")
 @Data
 @Builder
 public class NotificationEntity {

@@ -4,15 +4,19 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Builder;
+import jakarta.persistence.Id;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "notifications")
 @Data
-@Builder
+@SuperBuilder
+@NoArgsConstructor
 public class NotificationEntity {
 
+    @Id
     @Column(name = "id", nullable = false, unique = true)
     private String id;
 

@@ -1,10 +1,12 @@
 package com.microservicetwo.microservice_notification_dispatcher.infraestructure.persistance.mapper;
 
+import org.springframework.stereotype.Component;
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.Notification;
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.Notification.Channel;
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.Notification.Status;
 import com.microservicetwo.microservice_notification_dispatcher.infraestructure.persistance.entity.NotificationEntity;
 
+@Component
 public class NotificationMapper {
     
     public NotificationEntity toEntity(Notification notification){

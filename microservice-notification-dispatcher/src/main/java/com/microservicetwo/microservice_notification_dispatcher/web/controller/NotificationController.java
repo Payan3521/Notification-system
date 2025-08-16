@@ -21,7 +21,7 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final NotificationWebMapper notificationWebMapper;
     
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<NotificationResponse>> getByUserIdNotification(
         @PathVariable String id){
 

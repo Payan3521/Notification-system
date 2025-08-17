@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.Notification;
+import com.microservicetwo.microservice_notification_dispatcher.domain.model.SNSEvent;
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.SQSNotificationMessage;
 import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.ISQSPullerNotification;
 import lombok.RequiredArgsConstructor;
@@ -24,28 +25,28 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 public class SQSPullerNotification implements ISQSPullerNotification {
 
     private final SqsAsyncClient sqsAsyncClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     
     @Value("${aws.sqs.notification-queue}")
     private String queueUrl;
 
     @Override
     public Flux<SQSNotificationMessage> pullNotifications() {
-        return Flux.interval(Duration.ofSeconds(2)) // Polling cada 2 segundos
+        return Flux.interval(Duration.ofSeconds(2))
             .flatMap(tick -> pullMessagesFromSQS())
             .onErrorResume(error -> {
                 log.error("❌ Error en el polling de SQS: {}", error.getMessage());
                 return Mono.delay(Duration.ofSeconds(5))
-                    .then(Mono.empty()); // Continuar después del error
+                    .then(Mono.empty());
             })
-            .repeat(); // Repetir indefinidamente
+            .repeat();
     }
 
     private Flux<SQSNotificationMessage> pullMessagesFromSQS() {
         ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
             .queueUrl(queueUrl)
-            .maxNumberOfMessages(10) // Máximo 10 mensajes por request
-            .waitTimeSeconds(20) // Long polling de 20 segundos
+            .maxNumberOfMessages(10)
+            .waitTimeSeconds(20)
             .build();
 
         return Mono.fromFuture(sqsAsyncClient.receiveMessage(receiveRequest))
@@ -59,7 +60,7 @@ public class SQSPullerNotification implements ISQSPullerNotification {
         List<Message> messages = response.messages();
         
         if (messages.isEmpty()) {
-            log.debug("📭 No hay mensajes en SQS");
+            log.debug("�� No hay mensajes en SQS");
             return Flux.empty();
         }
 
@@ -76,22 +77,39 @@ public class SQSPullerNotification implements ISQSPullerNotification {
         return Mono.fromCallable(() -> {
             try {
                 String messageBody = sqsMessage.body();
-                log.debug("📄 Parseando mensaje: {}", messageBody);
+                log.debug("📄 Parseando mensaje SQS: {}", messageBody);
                 
-                // Parsear el JSON del mensaje a objeto Notification
-                Notification notification = objectMapper.readValue(messageBody, Notification.class);
+                // ✅ PRIMERO: Parsear el evento SNS
+                SNSEvent snsEvent = objectMapper.readValue(messageBody, SNSEvent.class);
+                log.debug("📡 Evento SNS parseado: Type={}, MessageId={}", 
+                    snsEvent.getType(), snsEvent.getMessageId());
                 
-                // Crear el wrapper con el receiptHandle para poder eliminar el mensaje después
+                // ✅ SEGUNDO: Extraer la notificación del campo Message del evento SNS
+                String notificationJson = snsEvent.getMessage();
+                log.debug("�� Contenido del mensaje SNS: {}", notificationJson);
+                
+                // ✅ TERCERO: Parsear la notificación JSON
+                Notification notification = objectMapper.readValue(notificationJson, Notification.class);
+                
+                // ✅ Verificar que la notificación tenga ID
+                if (notification.getId() == null || notification.getId().trim().isEmpty()) {
+                    throw new RuntimeException("La notificación no tiene ID válido");
+                }
+                
+                log.debug("✅ Notificación parseada exitosamente: ID={}, Channel={}, Status={}", 
+                    notification.getId(), notification.getChannel(), notification.getStatus());
+                
+                // ✅ Crear el wrapper con el receiptHandle
                 SQSNotificationMessage sqsNotificationMessage = new SQSNotificationMessage(
                     sqsMessage.receiptHandle(), 
                     notification
                 );
                 
-                log.debug("✅ Mensaje parseado exitosamente: ID={}", notification.getId());
                 return sqsNotificationMessage;
                 
             } catch (Exception e) {
                 log.error("❌ Error parseando mensaje SQS: {}", e.getMessage());
+                log.error("❌ Mensaje problemático: {}", sqsMessage.body());
                 throw new RuntimeException("Error parsing SQS message", e);
             }
         })

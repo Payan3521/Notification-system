@@ -167,29 +167,31 @@ public class ProccessNotificationUseCase {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
-    private boolean createNewUser(String contactInfo, Notification.Channel channel) {
-        try {
-            User newUser = new User();
-            newUser.setName("Usuario Automático"); // Nombre por defecto
-            newUser.setStatus(User.UserStatus.ACTIVE);
+   private boolean createNewUser(String contactInfo, Notification.Channel channel) {
+    try {
+        User newUser = new User();
+        // ✅ NO asignar ID manualmente - JPA lo generará automáticamente
+        newUser.setName("Usuario Automático");
+        newUser.setStatus(User.UserStatus.ACTIVE);
 
-            if (channel == Notification.Channel.MAIL) {
-                newUser.setEmail(contactInfo);
-                newUser.setPhoneNumber(""); // Vacío por ahora
-            } else if (channel == Notification.Channel.SMS) {
-                newUser.setPhoneNumber(contactInfo);
-                newUser.setEmail(""); // Vacío por ahora
-            }
-
-            User savedUser = portUser.saveUser(newUser);
-            log.info("👤 Usuario creado automáticamente: {}", savedUser.getId());
-            return true;
-
-        } catch (Exception e) {
-            log.error("❌ Error creando usuario automático: {}", e.getMessage());
-            return false;
+        if (channel == Notification.Channel.MAIL) {
+            newUser.setEmail(contactInfo);
+            newUser.setPhoneNumber(""); // Vacío por ahora
+        } else if (channel == Notification.Channel.SMS) {
+            newUser.setPhoneNumber(contactInfo);
+            newUser.setEmail(""); // Vacío por ahora
         }
+
+        User savedUser = portUser.saveUser(newUser);
+        log.info("👤 Usuario creado automáticamente: {} con contacto: {}", 
+            savedUser.getId(), contactInfo);
+        return true;
+
+    } catch (Exception e) {
+        log.error("❌ Error creando usuario automático: {}", e.getMessage(), e);
+        return false;
     }
+}
 
     private Mono<Boolean> attemptRetry(Notification notification, SQSNotificationMessage sqsMessage) {
         log.info("🔄 Intentando reenvío #{} para notificación {}", 

@@ -5,17 +5,22 @@ import org.springframework.stereotype.Service;
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.Notification;
 import com.microservicetwo.microservice_notification_dispatcher.domain.port.in.IGetNotificationAndSend;
 import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.INotificationPullerSQS;
+import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.ISQSMessageDeleter;
 import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.ISendNotification;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GetNotificationAndSendUseCase implements IGetNotificationAndSend{
 
     private final INotificationPullerSQS notificationPullerSQS;
     private final ISendNotification sendNotification;
+    private final ISQSMessageDeleter sqsMessageDeleter;
 
     @PostConstruct
     public void startPolling() {
@@ -34,27 +39,39 @@ public class GetNotificationAndSendUseCase implements IGetNotificationAndSend{
 
     @Override
     public Flux<Notification> getNotificationAndSend() {
-        return notificationPullerSQS.pullNotifications().doOnNext(notificationSQS -> {
-            if(notificationSQS.getChannel().equals("MAIL")) {
-                sendNotification.sendEmail(notificationSQS)
-                    .doOnNext(enviado -> {
-                        if (enviado) {
-                            System.out.println("Email enviado: " + notificationSQS);
-                        } else {
-                            System.out.println("Error al enviar email: " + notificationSQS);
-                        }
-                    }).subscribe();
-            }else if(notificationSQS.getChannel().equals("SMS")) {
-                sendNotification.sendSMS(notificationSQS)
-                    .doOnNext(enviado -> {
-                        if (enviado) {
-                            System.out.println("SMS enviado: " + notificationSQS);
-                        } else {
-                            System.out.println("Error al enviar SMS: " + notificationSQS);
-                        }
-                    }).subscribe();
-            }
-        });
+        return processNotifications();
+    }
+
+    
+    private Flux<Notification> processNotifications() {
+        return notificationPullerSQS.pullNotifications()
+            .flatMap(sqsMessage -> {
+                Notification notification = sqsMessage.getNotification();
+                String receiptHandle = sqsMessage.getReceiptHandle();
+                
+                log.info("Procesando notificación: {}", notification.getId());
+                
+                // Determinar el canal y enviar
+                Mono<Boolean> sendResult = switch (notification.getChannel()) {
+                    case MAIL -> sendNotification.sendEmail(notification);
+                    case SMS -> sendNotification.sendSMS(notification);
+                    case UNKNOWN -> Mono.just(false);
+                };
+
+                // Procesar el resultado del envío
+                return sendResult.flatMap(success -> {
+                    if (success) {
+                        log.info("Notificación {} enviada exitosamente", notification.getId());
+                        // ✅ Eliminar mensaje de SQS solo si se envió correctamente
+                        return sqsMessageDeleter.deleteMessage(receiptHandle)
+                            .thenReturn(notification);
+                    } else {
+                        log.error("Error al enviar notificación {}", notification.getId());
+                        // ✅ NO eliminar el mensaje, se procesará en el siguiente ciclo
+                        return Mono.empty();
+                    }
+                });
+            });
     }
     
 }

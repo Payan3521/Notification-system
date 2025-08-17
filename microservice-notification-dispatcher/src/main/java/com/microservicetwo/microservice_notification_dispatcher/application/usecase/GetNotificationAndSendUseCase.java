@@ -85,3 +85,7 @@ public class GetNotificationAndSendUseCase implements IGetNotificationAndSend{
  * Endpoint manual (por ejemplo, GET para probar)
  * Frameworks de integración (Apache Camel, Spring Integration, etc.)
  */
+
+ 1. las notificaciones no se estan enviando, hice la prueba para enviar una notificacion por email, y no se envio, lo reintentaba y reintentaba y nada... no se envia... 
+
+2. quiero que solo reintente 3 veces, despues de esos 3 reintentos, necesito enviarlo a una cola de fallidos, para despues pasar a valorar a ver porq fue que no se envio, entonces necesito implementar eso, ese reintento.

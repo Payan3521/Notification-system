@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class NotificationRequest {
     
     @NotBlank(message = "The info is required")
-    @Size(max = 20, message = "La info no puede exceder más de 20 caracteres")
+    @Size(max = 50, message = "La info no puede exceder más de 20 caracteres")
     private String info;
 
     @NotBlank(message = "subject is required")

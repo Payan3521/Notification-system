@@ -27,7 +27,7 @@ public class ProccessNotificationUseCase {
     private final IPortNotification portNotification;
     private final IPortUser portUser;
     private final ISQSMessageDeleter sqsMessageDeleter;
-    private final ISendNotification sendNotification;
+    //private final ISendNotification sendNotification;
    
     @PostConstruct
     public void startProcessing() {
@@ -224,14 +224,7 @@ public class ProccessNotificationUseCase {
     }
 
     private Mono<Boolean> sendNotificationByChannel(Notification notification) {
-        return switch (notification.getChannel()) {
-            case MAIL -> sendNotification.sendEmail(notification);
-            case SMS -> sendNotification.sendSMS(notification);
-            default -> {
-                log.error("❌ Canal desconocido: {}", notification.getChannel());
-                yield Mono.just(false);
-            }
-        };
+       return Mono.just(true) ;
     }
 
     private Mono<Notification> saveNotificationToDB(Notification notification) {

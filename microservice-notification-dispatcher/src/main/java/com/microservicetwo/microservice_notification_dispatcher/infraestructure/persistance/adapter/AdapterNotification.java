@@ -3,7 +3,7 @@ package com.microservicetwo.microservice_notification_dispatcher.infraestructure
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.Notification;
-import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.IAdapterNotification;
+import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.IPortNotification;
 import com.microservicetwo.microservice_notification_dispatcher.infraestructure.persistance.entity.NotificationEntity;
 import com.microservicetwo.microservice_notification_dispatcher.infraestructure.persistance.mapper.NotificationMapper;
 import com.microservicetwo.microservice_notification_dispatcher.infraestructure.persistance.repository.ORMnotification;
@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class AdapterNotification implements IAdapterNotification{
+public class AdapterNotification implements IPortNotification{
 
     private final ORMnotification ormNotification;
     private final NotificationMapper notificationMapper;

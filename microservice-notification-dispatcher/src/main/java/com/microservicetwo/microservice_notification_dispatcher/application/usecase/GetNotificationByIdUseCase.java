@@ -3,7 +3,7 @@ package com.microservicetwo.microservice_notification_dispatcher.application.use
 import com.microservicetwo.microservice_notification_dispatcher.domain.exception.NotificationNotFoundException;
 import com.microservicetwo.microservice_notification_dispatcher.domain.model.Notification;
 import com.microservicetwo.microservice_notification_dispatcher.domain.port.in.IGetNotificationById;
-import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.IAdapterNotification;
+import com.microservicetwo.microservice_notification_dispatcher.domain.port.out.IPortNotification;
 import lombok.RequiredArgsConstructor;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GetNotificationByIdUseCase implements IGetNotificationById {
 
-    private final IAdapterNotification adapterNotification; 
+    private final IPortNotification adapterNotification; 
 
     @Override
     public Optional<Notification> getByIdNotification(String id) {

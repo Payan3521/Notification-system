@@ -32,5 +32,5 @@ public class NotificationController {
             NotificationResponse notificationResponse = notificationWebMapper.toResponse(notification);
 
             return ResponseEntity.ok(ApiResponse.success("Notification found successfully", notificationResponse));
-        }
+    }
 }

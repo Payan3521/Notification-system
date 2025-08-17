@@ -5,12 +5,30 @@ public class User {
     private String name;
     private String email;
     private String phoneNumber;
+    private UserStatus status;
 
-    public User(Long id, String name, String email, String phoneNumber) {
+    public User(Long id, String name, String email, String phoneNumber, UserStatus status) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.status = status != null ? status : UserStatus.ACTIVE;
+    }
+
+    public User(){
+        this.status = UserStatus.ACTIVE;
+    }
+
+    public boolean isActive() {
+        return this.status == UserStatus.ACTIVE;
+    }
+
+    public UserStatus getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
 
@@ -44,6 +62,12 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public enum UserStatus {
+        ACTIVE,
+        INACTIVE,
+        SUSPENDED
     }
 
 }

@@ -2,6 +2,9 @@ package com.microservicetwo.microservice_notification_dispatcher.domain.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Notification {
     private String id;
     private String info;
@@ -23,6 +26,27 @@ public class Notification {
         this.status = status;
         this.sentTime = sentTime;
         this.retryCount = retryCount;
+    }
+
+    public boolean canRetry() {
+        return retryCount < 3;
+    }
+
+    public boolean isSuccessful() {
+        return status == Status.SENT;
+    }
+
+    public void incrementRetry() {
+        this.retryCount++;
+    }
+
+    public void markAsSent() {
+        this.status = Status.SENT;
+        this.sentTime = LocalDateTime.now();
+    }
+    
+    public void markAsFailed(String errorMessage) {
+        this.status = Status.FAILED;
     }
 
 

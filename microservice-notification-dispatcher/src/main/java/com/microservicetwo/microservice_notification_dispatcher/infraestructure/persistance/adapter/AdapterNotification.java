@@ -18,27 +18,43 @@ public class AdapterNotification implements IAdapterNotification{
 
     @Override
     public Optional<Notification> GetByIdNotification(String id) {
-            Optional<NotificationEntity> notificationEntity = ormNotification.findById(id);
-    
-            if (notificationEntity.isPresent()) {
-                Notification notification = notificationMapper.toDomain(notificationEntity.get());
-                return Optional.of(notification);
-            }else{
-                return Optional.empty();
-            }   
-    
+        Optional<NotificationEntity> notificationEntity = ormNotification.findById(id);
+
+        if (notificationEntity.isPresent()) {
+            Notification notification = notificationMapper.toDomain(notificationEntity.get());
+            return Optional.of(notification);
+        }else{
+            return Optional.empty();
+        }   
     }
 
     @Override
     public Notification saveNotification(Notification notification) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'saveNotification'");
+        NotificationEntity notificationEntity = notificationMapper.toEntity(notification);
+        NotificationEntity savedEntity = ormNotification.save(notificationEntity);
+        return notificationMapper.toDomain(savedEntity);
     }
 
     @Override
-    public Notification updateNotification(Notification notification) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateNotification'");
+    public Optional<Notification> updateNotification(String notificationId, Notification notification) {
+        Optional<NotificationEntity> existingEntity = ormNotification.findById(notificationId);
+        if (existingEntity.isPresent()) {
+            NotificationEntity notificationSaved = existingEntity.get();
+
+            notificationSaved.setInfo(notification.getInfo());
+            notificationSaved.setSubject(notification.getSubject());
+            notificationSaved.setBody(notification.getBody());
+            notificationSaved.setChannel(notification.getChannel().name());
+            notificationSaved.setStatus(notification.getStatus().name());
+            notificationSaved.setCreatedAt(notification.getCreatedAt());
+            notificationSaved.setSentTime(notification.getSentTime());
+            notificationSaved.setRetryCount(notification.getRetryCount());
+
+            NotificationEntity updatedEntity = ormNotification.save(notificationSaved);
+            return Optional.of(notificationMapper.toDomain(updatedEntity));
+        } else {
+            return Optional.empty();
+        }
     }
 
 }

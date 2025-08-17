@@ -19,5 +19,4 @@ public class NotificationRequest {
     @NotBlank(message = "body is required")
     private String body;
 
-
 }

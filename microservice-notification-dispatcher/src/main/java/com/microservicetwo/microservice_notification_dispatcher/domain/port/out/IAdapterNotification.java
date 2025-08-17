@@ -6,5 +6,5 @@ import com.microservicetwo.microservice_notification_dispatcher.domain.model.Not
 public interface IAdapterNotification {
     Optional<Notification> GetByIdNotification(String id);
     Notification saveNotification(Notification notification);
-    Notification updateNotification(Notification notification);
+    Optional<Notification> updateNotification(String notificationId, Notification notification);
 }

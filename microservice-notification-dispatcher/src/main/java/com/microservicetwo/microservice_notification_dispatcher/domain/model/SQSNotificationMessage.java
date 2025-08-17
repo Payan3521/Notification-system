@@ -19,7 +19,7 @@ public class SQSNotificationMessage {
         this.receiptHandle = receiptHandle;
     }
 
-    public Notification getNotification() {
+    public Notification getNotification() { 
         return notification;
     }
 

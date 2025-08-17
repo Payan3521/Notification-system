@@ -77,7 +77,7 @@ public class SQSPullerNotification implements ISQSPullerNotification {
         return Mono.fromCallable(() -> {
             try {
                 String messageBody = sqsMessage.body();
-                log.debug("📄 Parseando mensaje SQS: {}", messageBody);
+                log.debug("📄 Parseando mensaje SQS: {}", messageBody); 
                 
                 // ✅ PRIMERO: Parsear el evento SNS
                 SNSEvent snsEvent = objectMapper.readValue(messageBody, SNSEvent.class);

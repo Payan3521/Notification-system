@@ -15,7 +15,7 @@ public class SQSMessageDeleter implements ISQSMessageDeleter{
 
     public SQSMessageDeleter(SqsAsyncClient sqsAsyncClient,
                             @Value("${aws.sqs.notification-queue}") String queueUrl) {
-        this.sqsAsyncClient = sqsAsyncClient;
+        this.sqsAsyncClient = sqsAsyncClient; 
         this.queueUrl = queueUrl;
     }
 

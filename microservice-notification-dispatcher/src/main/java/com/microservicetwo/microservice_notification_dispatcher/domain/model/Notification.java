@@ -1,10 +1,6 @@
 package com.microservicetwo.microservice_notification_dispatcher.domain.model;
 
 import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Notification {
     private String id;
     private String info;

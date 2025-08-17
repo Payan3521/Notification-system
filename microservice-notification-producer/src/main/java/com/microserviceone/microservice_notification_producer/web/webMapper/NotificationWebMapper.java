@@ -24,7 +24,7 @@ public class NotificationWebMapper {
             LocalDateTime.now(), 
             Status.PENDING, 
             null, 
-            0);
+            1);
 
         return notification;
     }

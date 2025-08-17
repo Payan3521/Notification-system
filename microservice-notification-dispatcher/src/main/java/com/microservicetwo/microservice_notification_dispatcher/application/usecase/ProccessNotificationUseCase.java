@@ -31,7 +31,7 @@ public class ProccessNotificationUseCase {
    
     @PostConstruct
     public void startProcessing() {
-        log.info("🚀 Iniciando procesamiento de notificaciones desde SQS");
+        log.info("Iniciando procesamiento de notificaciones desde SQS");
         processNotifications()
             .subscribeOn(Schedulers.boundedElastic())
             .subscribe();
@@ -126,7 +126,7 @@ public class ProccessNotificationUseCase {
                     return saveNotificationToDB(incomingNotification)
                         .then(deleteMessageFromSQS(sqsMessage.getReceiptHandle()))
                         .thenReturn(false);
-                }
+                } 
 
                 // Usuario válido, procesar notificación
                 incomingNotification.setCreatedAt(LocalDateTime.now());

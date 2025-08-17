@@ -48,7 +48,7 @@ public class SendNotification implements ISendNotification {
                 .build();
 
             Content textBody = Content.builder()
-                .data(notification.getBody())
+                .data(notification.getBody()) 
                 .charset("UTF-8")
                 .build();
 

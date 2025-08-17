@@ -12,7 +12,7 @@ public class SNSEvent {
     private String type;
     
     @JsonProperty("MessageId")
-    private String messageId;
+    private String messageId; 
     
     @JsonProperty("TopicArn")
     private String topicArn;

@@ -29,4 +29,16 @@ public class AdapterNotification implements IAdapterNotification{
     
     }
 
+    @Override
+    public Notification saveNotification(Notification notification) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'saveNotification'");
+    }
+
+    @Override
+    public Notification updateNotification(Notification notification) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateNotification'");
+    }
+
 }

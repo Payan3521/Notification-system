@@ -9,6 +9,8 @@ import software.amazon.awssdk.regions.Region;
 
 @Configuration
 public class AwsConfig {
+
+
     @Bean
     public SqsAsyncClient sqsAsyncClient(@Value("${aws.region}") String region) {
         return SqsAsyncClient.builder()
@@ -16,4 +18,5 @@ public class AwsConfig {
             .credentialsProvider(DefaultCredentialsProvider.create())
             .build();
     }
+
 }

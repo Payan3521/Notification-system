@@ -26,11 +26,11 @@ public class NotificationPullerSQS implements INotificationPullerSQS {
 
     @Override
     public Flux<Notification> pullNotifications() {
-        ReceiveMessageRequest request = ReceiveMessageRequest.builder()
-                .queueUrl(queueUrl)
-                .maxNumberOfMessages(10)
-                .waitTimeSeconds(20)
-                .build();
+            ReceiveMessageRequest request = ReceiveMessageRequest.builder()
+            .queueUrl(queueUrl)
+            .maxNumberOfMessages(10)
+            .waitTimeSeconds(20)
+            .build();
 
         return Flux.defer(() ->
             Flux.fromIterable(
@@ -38,17 +38,22 @@ public class NotificationPullerSQS implements INotificationPullerSQS {
                     .thenApply(response -> response.messages())
                     .join()
             )
-        ).map(message -> {
+        ).flatMap(message -> {
             try {
                 Notification notification = objectMapper.readValue(message.body(), Notification.class);
-                // Elimina el mensaje de la cola después de procesarlo
-                sqsAsyncClient.deleteMessage(DeleteMessageRequest.builder()
-                        .queueUrl(queueUrl)
-                        .receiptHandle(message.receiptHandle())
-                        .build());
-                return notification;
+                // Aquí procesas la notificación (ejemplo: enviar mail/SMS)
+                boolean enviado = enviarNotificacion(notification); // tu lógica
+                if (enviado) {
+                    // Solo eliminas si el envío fue exitoso
+                    sqsAsyncClient.deleteMessage(DeleteMessageRequest.builder()
+                            .queueUrl(queueUrl)
+                            .receiptHandle(message.receiptHandle())
+                            .build());
+                }
+                return Flux.just(notification);
             } catch (Exception e) {
-                throw new RuntimeException("Error parsing notification", e);
+                // Si hay error, NO eliminas el mensaje
+                return Flux.empty();
             }
         });
     }

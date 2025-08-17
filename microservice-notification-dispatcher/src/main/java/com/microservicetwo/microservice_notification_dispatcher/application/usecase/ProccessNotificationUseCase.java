@@ -224,7 +224,15 @@ public class ProccessNotificationUseCase {
     }
 
     private Mono<Boolean> sendNotificationByChannel(Notification notification) {
-       return Mono.just(true) ;
+        return Mono.just(true);
+        /*return switch (notification.getChannel()) {
+            case MAIL -> sendNotification.sendEmail(notification);
+            case SMS -> sendNotification.sendSMS(notification);
+            default -> {
+                log.error("❌ Canal desconocido: {}", notification.getChannel());
+                yield Mono.just(false);
+            }
+        };*/
     }
 
     private Mono<Notification> saveNotificationToDB(Notification notification) {

@@ -165,5 +165,4 @@ public class SendNotification implements ISendNotification {
 # 4. Verificar números de teléfono (opcional)
 tambien hay que configurar dominio en aws console en ses para verificar el codigo y demas
 agregar AmazonSESFullAccess
-poner emails gmail.com
 */

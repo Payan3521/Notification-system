@@ -28,7 +28,7 @@ services:
       context: ../eureka-server
       dockerfile: Dockerfile
     container_name: eureka-server
-    restart: unless-stopped
+    restart: always
     ports:
       - "8761:8761"
     environment:
@@ -38,18 +38,18 @@ services:
     depends_on:
       mariadb:
         condition: service_started
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
 
   notification-producer:
     build:
       context: ../microservice-notification-producer
       dockerfile: Dockerfile
     container_name: notification-producer
-    restart: unless-stopped
+    restart: always
     ports:
       - "8081:8083"
     environment:
@@ -63,18 +63,18 @@ services:
         condition: service_started
     networks:
       - notification-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
 
   notification-dispatcher:
     build:
       context: ../microservice-notification-dispatcher
       dockerfile: Dockerfile
     container_name: notification-dispatcher
-    restart: unless-stopped
+    restart: always
     ports:
       - "8082:8082"
     environment:
@@ -93,11 +93,11 @@ services:
         condition: service_started
     networks:
       - notification-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
 
 volumes:
   mariadb_data:

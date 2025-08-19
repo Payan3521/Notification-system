@@ -15,17 +15,24 @@ spec:
     spec:
       containers:
       - name: mariadb
-        image: mariadb:10.6
+        image: mariadb:latest
         ports:
         - containerPort: 3306
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: "12345"
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: DB_PASSWORD
         - name: MYSQL_DATABASE
-          value: "notifications"
-        volumeMounts:
-        - name: mariadb-storage
-          mountPath: /var/lib/mysql
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: DB_NAME
+        - name: MYSQL_ROOT_HOST
+          value: "%"
+        - name: MYSQL_INITDB_SKIP_TZINFO
+          value: "1"
         resources:
           requests:
             memory: "256Mi"
@@ -33,11 +40,20 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
+        volumeMounts:
+        - name: mariadb-data
+          mountPath: /var/lib/mysql
+        # Health check simplificado
         livenessProbe:
-          tcpSocket:
-            port: 3306
-          initialDelaySeconds: 30
-          periodSeconds: 10
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
         readinessProbe:
           exec:
             command:
@@ -45,10 +61,11 @@ spec:
             - ping
             - -h
             - localhost
-          initialDelaySeconds: 5
-          periodSeconds: 2
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
       volumes:
-      - name: mariadb-storage
+      - name: mariadb-data
         persistentVolumeClaim:
           claimName: mariadb-pvc
 ---
@@ -63,6 +80,7 @@ spec:
   ports:
   - port: 3306
     targetPort: 3306
+    name: mysql
   type: ClusterIP
 ---
 apiVersion: v1
@@ -75,4 +93,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 1Gi 

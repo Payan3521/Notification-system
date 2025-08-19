@@ -10,3 +10,5 @@ data:
   DATABASE_USERNAME: "root"
   DATABASE_PASSWORD: "12345"
   SPRING_PROFILES_ACTIVE: "kubernetes"
+  DB_NAME: "notifications"
+  DB_PASSWORD: "12345" 

@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: notification-ingress
+  namespace: notification-system
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /eureka
+        pathType: Prefix
+        backend:
+          service:
+            name: eureka-server
+            port:
+              number: 8761
+      - path: /producer
+        pathType: Prefix
+        backend:
+          service:
+            name: notification-producer
+            port:
+              number: 8081
+      - path: /dispatcher
+        pathType: Prefix
+        backend:
+          service:
+            name: notification-dispatcher
+            port:
+              number: 8082
+---
+# Service para acceso externo
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-ingress-service
+  namespace: notification-system
+spec:
+  type: NodePort
+  selector:
+    app: notification-producer
+  ports:
+  - port: 80
+    targetPort: 8081
+    nodePort: 30080 

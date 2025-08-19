@@ -8,6 +8,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_INITDB_SKIP_TZINFO: 1
     ports:
       - 3307:3306
     volumes:
@@ -15,17 +17,18 @@ services:
     networks:
       - notification-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p12345"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 3
+      interval: 10s
+      start_period: 30s
 
   eureka-server:
     build:
       context: ../eureka-server
       dockerfile: Dockerfile
     container_name: eureka-server
+    restart: unless-stopped
     ports:
       - "8761:8761"
     environment:
@@ -34,7 +37,7 @@ services:
       - notification-network
     depends_on:
       mariadb:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
       interval: 30s
@@ -46,8 +49,9 @@ services:
       context: ../microservice-notification-producer
       dockerfile: Dockerfile
     container_name: notification-producer
+    restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "8081:8083"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
@@ -70,12 +74,13 @@ services:
       context: ../microservice-notification-dispatcher
       dockerfile: Dockerfile
     container_name: notification-dispatcher
+    restart: unless-stopped
     ports:
       - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/notifications
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/${DB_NAME}
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - AWS_REGION=${AWS_REGION}
@@ -83,7 +88,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     depends_on:
       mariadb:
-        condition: service_healthy
+        condition: service_started
       eureka-server:
         condition: service_started
     networks:
